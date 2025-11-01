@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PixelForge — Sintra Game & Maker Hub</title>
+    <title>Sintra Game & Maker Hub</title>
     <style>
         * {
             margin: 0;
@@ -31,6 +31,7 @@
             width: 100%;
             padding: 40px;
             animation: fadeIn 0.5s ease-in;
+            position: relative;
         }
 
         @keyframes fadeIn {
@@ -51,6 +52,33 @@
             margin-bottom: 20px;
             text-align: center;
             font-weight: 900;
+            position: relative;
+        }
+
+        .lang-selector {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+        }
+
+        .lang-dropdown {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 2px 6px;
+            font-size: 1.3em;
+            cursor: pointer;
+            transition: all 0.3s;
+            outline: none;
+            line-height: 1;
+        }
+
+        .lang-dropdown:hover {
+            border-color: #ff8800;
+        }
+
+        .lang-dropdown:focus {
+            border-color: #ff8800;
         }
 
         .tagline {
@@ -60,6 +88,10 @@
             text-align: center;
             line-height: 1.8;
             font-weight: 600;
+        }
+
+        [data-lang]:not(.active-lang) {
+            display: none;
         }
 
         .form-group {
@@ -220,31 +252,57 @@
 
 <body>
     <div class="container">
-        <h1>🔥 🎮 🧙‍♂️ 👀 🙂 ⚡</h1>
-        <p class="tagline">
+        <h1>
+            🔥 🎮 🧙‍♂️ 🃏 ⚡ 🎲
+            <span class="lang-selector">
+                <select class="lang-dropdown" id="langSelect">
+                    <option value="en">🇬🇧</option>
+                    <option value="pt">🇵🇹</option>
+                </select>
+            </span>
+        </h1>
+
+        <p class="tagline active-lang" data-lang="en">
             Sintra's first Game & Maker Hub — by players, for players.
+        </p>
+        <p class="tagline" data-lang="pt">
+            O primeiro Game & Maker Hub de Sintra — por jogadores, para jogadores.
         </p>
 
         <form id="interestForm">
             <div class="interest-section">
-                <h3>What interests you? (Select all that apply)</h3>
+                <h3 class="active-lang" data-lang="en">What interests you? (Select all that apply)</h3>
+                <h3 data-lang="pt">O que te interessa? (Selecione todas as opções)</h3>
+
                 <div class="interest-buttons">
                     <button type="button" class="interest-btn" data-interest="tcg">
-                        Trading Card Games - Pokémon, Magic, One Piece, Lorcana
+                        <span class="active-lang" data-lang="en">Trading Card Games - Pokémon, Magic, One Piece,
+                            Lorcana</span>
+                        <span data-lang="pt">Jogos de Cartas - Pokémon, Magic, One Piece, Lorcana</span>
                     </button>
                     <button type="button" class="interest-btn" data-interest="play">
-                        Tournaments, pre-releases and other community events
+                        <span class="active-lang" data-lang="en">Tournaments, pre-releases and other community
+                            events</span>
+                        <span data-lang="pt">Torneios, pré-lançamentos e outros eventos comunitários</span>
                     </button>
                     <button type="button" class="interest-btn" data-interest="board-games">
-                        Board game nights & communities
+                        <span class="active-lang" data-lang="en">Board game nights & communities</span>
+                        <span data-lang="pt">Noites de jogos de tabuleiro & comunidades</span>
                     </button>
                     <button type="button" class="interest-btn" data-interest="3d-printing">
-                        3D printing services (personalized accessories, like deck boxes, counters, etc..)
+                        <span class="active-lang" data-lang="en">3D printing services (personalized accessories, like
+                            deck boxes, counters, etc.)</span>
+                        <span data-lang="pt">Serviços de impressão 3D (acessórios personalizados, como caixas de
+                            baralho, contadores, etc.)</span>
                     </button>
                     <button type="button" class="interest-btn" data-interest="tech-repair">
-                        Tech repair (phones, consoles, laptops, etc.)
+                        <span class="active-lang" data-lang="en">Tech repair (phones, consoles, laptops, etc.)</span>
+                        <span data-lang="pt">Reparação de tecnologia (telemóveis, consolas, portáteis, etc.)</span>
                     </button>
                 </div>
+
+                <!-- Hidden input to store selected interests -->
+                <input type="hidden" name="interests" id="interestsInput" required>
             </div>
 
             <div class="form-group">
@@ -252,19 +310,56 @@
                 <input type="email" id="email" name="email" required placeholder="your.email@example.com">
             </div>
 
-            <button type="submit" class="submit-btn">Submit Interest</button>
+            <button type="submit" class="submit-btn">
+                <span class="active-lang" data-lang="en">Submit Interest</span>
+                <span data-lang="pt">Submeter Interesse</span>
+            </button>
         </form>
 
         <div id="successMessage" class="success-message">
-            Thank you for your interest! We'll keep you updated.
+            <span class="active-lang" data-lang="en">Thank you for your interest! We'll keep you updated.</span>
+            <span data-lang="pt">Obrigado pelo seu interesse! Manteremos contacto.</span>
         </div>
 
         <div id="errorMessage" class="error-message">
-            Please fill in your email and select at least one interest.
+            <span class="active-lang" data-lang="en">Please fill in your email and select at least one interest.</span>
+            <span data-lang="pt">Por favor preencha o seu email e selecione pelo menos uma opção.</span>
         </div>
     </div>
 
     <script>
+        // Language toggle with dropdown
+        const langSelect = document.getElementById('langSelect');
+        let currentLang = 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+
+            // Update dropdown value
+            langSelect.value = lang;
+
+            // Update HTML lang attribute
+            document.documentElement.lang = lang;
+
+            // Show/hide content
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                el.classList.toggle('active-lang', el.getAttribute('data-lang') === lang);
+            });
+
+            // Save preference
+            localStorage.setItem('preferredLang', lang);
+        }
+
+        // Load saved language preference
+        const savedLang = localStorage.getItem('preferredLang');
+        if (savedLang && (savedLang === 'en' || savedLang === 'pt')) {
+            setLanguage(savedLang);
+        }
+
+        langSelect.addEventListener('change', (e) => {
+            setLanguage(e.target.value);
+        });
+
         // Handle interest button selection
         const interestButtons = document.querySelectorAll('.interest-btn');
         const selectedInterests = new Set();
@@ -287,6 +382,7 @@
         const form = document.getElementById('interestForm');
         const successMessage = document.getElementById('successMessage');
         const errorMessage = document.getElementById('errorMessage');
+        const interestsInput = document.getElementById('interestsInput');
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -296,7 +392,6 @@
             errorMessage.classList.remove('show');
 
             const email = document.getElementById('email').value;
-            const cityArea = document.getElementById('cityArea').value;
 
             // Validation
             if (!email || selectedInterests.size === 0) {
@@ -304,38 +399,43 @@
                 return;
             }
 
-            // Collect form data
-            const formData = {
-                email: email,
-                cityArea: cityArea || 'Not specified',
-                interests: Array.from(selectedInterests),
-                timestamp: new Date().toISOString()
-            };
+            // Store interests in hidden input for form submission
+            interestsInput.value = Array.from(selectedInterests).join(', ');
 
-            // Log to console (for production, integrate with a service like Formspree, Netlify Forms, or Firebase)
-            console.log('Form submission:', formData);
+            // Submit the form via fetch to Formspree
+            const formData = new FormData(form);
 
-            // For now, store in localStorage as a simple solution for demonstration
-            try {
-                const submissions = JSON.parse(localStorage.getItem('submissions') || '[]');
-                submissions.push(formData);
-                localStorage.setItem('submissions', JSON.stringify(submissions));
-            } catch (error) {
-                console.error('Error storing submission:', error);
-            }
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // Show success message
+                        successMessage.classList.add('show');
 
-            // Show success message
-            successMessage.classList.add('show');
+                        // Reset form
+                        form.reset();
+                        selectedInterests.clear();
+                        interestButtons.forEach(btn => btn.classList.remove('selected'));
 
-            // Reset form
-            form.reset();
-            selectedInterests.clear();
-            interestButtons.forEach(btn => btn.classList.remove('selected'));
-
-            // Hide success message after 5 seconds
-            setTimeout(() => {
-                successMessage.classList.remove('show');
-            }, 5000);
+                        // Hide success message after 5 seconds
+                        setTimeout(() => {
+                            successMessage.classList.remove('show');
+                        }, 5000);
+                    } else {
+                        errorMessage.textContent = 'Something went wrong. Please try again.';
+                        errorMessage.classList.add('show');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    errorMessage.textContent = 'Network error. Please check your connection.';
+                    errorMessage.classList.add('show');
+                });
         });
     </script>
 </body>
