@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelForge — Sintra Game & Maker Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #ff8800 0%, #ff6600 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #0b0b0b;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 900;
+        }
+
+        .tagline {
+            color: #0b0b0b;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.8;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #0b0b0b;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        input[type="email"],
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="email"]:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #ff8800;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        .interest-section {
+            margin: 30px 0;
+        }
+
+        .interest-section h3 {
+            color: #0b0b0b;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            font-weight: 700;
+        }
+
+        .interest-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .interest-btn {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .interest-btn:hover {
+            background: #f0f1f5;
+            border-color: #ff8800;
+            transform: translateX(5px);
+        }
+
+        .interest-btn.selected {
+            background: #ff8800;
+            color: white;
+            border-color: #ff8800;
+        }
+
+        .interest-btn.selected::before {
+            content: "✓";
+            font-weight: bold;
+        }
+
+        .interest-btn::before {
+            content: "";
+            width: 20px;
+            text-align: center;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #ff8800 0%, #ff6600 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 136, 0, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .success-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error-message {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            border: 1px solid #f5c6cb;
+        }
+
+        .show {
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .tagline {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔥 🎮 🧙‍♂️ 👀 🙂 ⚡</h1>
+        <p class="tagline">
+            Sintra's first Game & Maker Hub — by players, for players.
+        </p>
+
+        <form id="interestForm">
+            <div class="interest-section">
+                <h3>What interests you? (Select all that apply)</h3>
+                <div class="interest-buttons">
+                    <button type="button" class="interest-btn" data-interest="tcg">
+                        Trading Card Games - Pokémon, Magic, One Piece, Lorcana
+                    </button>
+                    <button type="button" class="interest-btn" data-interest="play">
+                        Tournaments, pre-releases and other community events
+                    </button>
+                    <button type="button" class="interest-btn" data-interest="board-games">
+                        Board game nights & communities
+                    </button>
+                    <button type="button" class="interest-btn" data-interest="3d-printing">
+                        3D printing services (personalized accessories, like deck boxes, counters, etc..)
+                    </button>
+                    <button type="button" class="interest-btn" data-interest="tech-repair">
+                        Tech repair (phones, consoles, laptops, etc.)
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email <span class="required">*</span></label>
+                <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+            </div>
+
+            <button type="submit" class="submit-btn">Submit Interest</button>
+        </form>
+
+        <div id="successMessage" class="success-message">
+            Thank you for your interest! We'll keep you updated.
+        </div>
+
+        <div id="errorMessage" class="error-message">
+            Please fill in your email and select at least one interest.
+        </div>
+    </div>
+
+    <script>
+        // Handle interest button selection
+        const interestButtons = document.querySelectorAll('.interest-btn');
+        const selectedInterests = new Set();
+
+        interestButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const interest = button.dataset.interest;
+
+                if (selectedInterests.has(interest)) {
+                    selectedInterests.delete(interest);
+                    button.classList.remove('selected');
+                } else {
+                    selectedInterests.add(interest);
+                    button.classList.add('selected');
+                }
+            });
+        });
+
+        // Handle form submission
+        const form = document.getElementById('interestForm');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Hide previous messages
+            successMessage.classList.remove('show');
+            errorMessage.classList.remove('show');
+
+            const email = document.getElementById('email').value;
+            const cityArea = document.getElementById('cityArea').value;
+
+            // Validation
+            if (!email || selectedInterests.size === 0) {
+                errorMessage.classList.add('show');
+                return;
+            }
+
+            // Collect form data
+            const formData = {
+                email: email,
+                cityArea: cityArea || 'Not specified',
+                interests: Array.from(selectedInterests),
+                timestamp: new Date().toISOString()
+            };
+
+            // Log to console (for production, integrate with a service like Formspree, Netlify Forms, or Firebase)
+            console.log('Form submission:', formData);
+
+            // For now, store in localStorage as a simple solution for demonstration
+            try {
+                const submissions = JSON.parse(localStorage.getItem('submissions') || '[]');
+                submissions.push(formData);
+                localStorage.setItem('submissions', JSON.stringify(submissions));
+            } catch (error) {
+                console.error('Error storing submission:', error);
+            }
+
+            // Show success message
+            successMessage.classList.add('show');
+
+            // Reset form
+            form.reset();
+            selectedInterests.clear();
+            interestButtons.forEach(btn => btn.classList.remove('selected'));
+
+            // Hide success message after 5 seconds
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+            }, 5000);
+        });
+    </script>
+</body>
+
+</html>
