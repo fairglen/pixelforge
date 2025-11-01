@@ -306,13 +306,17 @@
                 timestamp: new Date().toISOString()
             };
 
-            // Log to console (for GitHub Pages, this would need a backend service)
+            // Log to console (for production, integrate with a service like Formspree, Netlify Forms, or Firebase)
             console.log('Form submission:', formData);
 
-            // For now, store in localStorage as a simple solution
-            const submissions = JSON.parse(localStorage.getItem('submissions') || '[]');
-            submissions.push(formData);
-            localStorage.setItem('submissions', JSON.stringify(submissions));
+            // For now, store in localStorage as a simple solution for demonstration
+            try {
+                const submissions = JSON.parse(localStorage.getItem('submissions') || '[]');
+                submissions.push(formData);
+                localStorage.setItem('submissions', JSON.stringify(submissions));
+            } catch (error) {
+                console.error('Error storing submission:', error);
+            }
 
             // Show success message
             successMessage.classList.add('show');
