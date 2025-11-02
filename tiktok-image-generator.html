@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Image Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+
+        .controls {
+            max-width: 1080px;
+            margin: 0 auto 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .controls h2 {
+            color: #ff8800;
+            margin-bottom: 15px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #ff8800;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #ff6600;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .preview-container {
+            max-width: 1080px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .preview-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        /* TikTok Canvas - Exact 1080x1920px (9:16 ratio) */
+        #tiktokImage,
+        #tiktokImagePT {
+            width: 1080px;
+            height: 1920px;
+            background: linear-gradient(180deg, #ff8800 0%, #ff6600 50%, #ff4400 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 80px 60px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        /* Animated background elements */
+        .bg-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.05;
+            overflow: hidden;
+        }
+
+        .emoji-float {
+            position: absolute;
+            font-size: 100px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .emoji-1 { top: 10%; left: 10%; animation-delay: 0s; }
+        .emoji-2 { top: 20%; right: 15%; animation-delay: 0.5s; }
+        .emoji-3 { top: 40%; left: 5%; animation-delay: 1s; }
+        .emoji-4 { top: 60%; right: 10%; animation-delay: 1.5s; }
+        .emoji-5 { top: 80%; left: 15%; animation-delay: 2s; }
+        .emoji-6 { bottom: 10%; right: 20%; animation-delay: 2.5s; }
+
+        /* Main content */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .emoji-header {
+            font-size: 120px;
+            letter-spacing: 15px;
+            margin-bottom: 50px;
+            filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
+        }
+
+        .badge {
+            background: white;
+            color: #ff6600;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 40px;
+            display: inline-block;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .main-title {
+            font-size: 120px;
+            font-weight: 900;
+            color: white;
+            text-align: center;
+            line-height: 1.1;
+            margin-bottom: 40px;
+            text-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            letter-spacing: -2px;
+        }
+
+        .subtitle {
+            font-size: 48px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.95);
+            text-align: center;
+            margin-bottom: 60px;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 60px;
+            padding: 0 40px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+        }
+
+        .feature-text {
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .tagline {
+            font-size: 40px;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 40px;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .location {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 20px 50px;
+            border-radius: 50px;
+            font-size: 36px;
+            font-weight: 700;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 50px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta {
+            background: white;
+            color: #ff6600;
+            padding: 25px 60px;
+            border-radius: 50px;
+            font-size: 42px;
+            font-weight: 900;
+            display: inline-block;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-top: 40px;
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e8f4f8;
+            border-left: 4px solid #ff8800;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        /* Language toggle */
+        [data-lang] {
+            display: none;
+        }
+
+        [data-lang].active {
+            display: block;
+        }
+
+        /* Scale preview for smaller screens */
+        @media (max-width: 1150px) {
+            #tiktokImage,
+            #tiktokImagePT {
+                transform: scale(0.5);
+                transform-origin: top center;
+            }
+            .preview-container {
+                overflow: hidden;
+            }
+        }
+
+        @media (max-width: 600px) {
+            #tiktokImage,
+            #tiktokImagePT {
+                transform: scale(0.3);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h2>📱 TikTok Image Generator</h2>
+        <p style="margin-bottom: 15px; color: #666;">
+            Generate a perfect 1080x1920px (9:16) vertical image for TikTok, Instagram Stories, Reels, etc.
+        </p>
+        
+        <!-- Language Selector -->
+        <div style="margin-bottom: 15px;">
+            <label style="font-weight: 600; margin-right: 10px;">Language:</label>
+            <button onclick="switchLanguage('en')" id="langBtn-en" style="background: #ff8800;">🇬🇧 English</button>
+            <button onclick="switchLanguage('pt')" id="langBtn-pt" style="background: #ccc;">🇵🇹 Português</button>
+        </div>
+        
+        <div class="button-group">
+            <button onclick="downloadImage()">📥 Download Image</button>
+            <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+            <button onclick="openInNewTab()">🔗 Open in New Tab</button>
+        </div>
+        <div id="status" class="status"></div>
+    </div>
+
+    <div class="preview-container">
+        <div class="preview-label">Preview (1080x1920px - TikTok/Instagram Stories format):</div>
+        
+        <!-- ENGLISH VERSION -->
+        <div id="tiktokImage" data-lang="en" class="active">
+            <!-- Background pattern -->
+            <div class="bg-pattern">
+                <div class="emoji-float emoji-1">🎮</div>
+                <div class="emoji-float emoji-2">🎲</div>
+                <div class="emoji-float emoji-3">🃏</div>
+                <div class="emoji-float emoji-4">🧙‍♂️</div>
+                <div class="emoji-float emoji-5">⚡</div>
+                <div class="emoji-float emoji-6">🔥</div>
+            </div>
+
+            <!-- Main content -->
+            <div class="content-wrapper">
+                <div class="emoji-header">🔥 🎮 🧙‍♂️</div>
+                
+                <div class="badge">COMING SOON</div>
+                
+                <h1 class="main-title">Sintra<br>Game &<br>Maker Hub</h1>
+                
+                <p class="tagline">by players, for players</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🃏</div>
+                        <div class="feature-text">TCG Events</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎲</div>
+                        <div class="feature-text">Board Games</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🖨️</div>
+                        <div class="feature-text">3D Printing</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔧</div>
+                        <div class="feature-text">Tech Repair</div>
+                    </div>
+                </div>
+                
+                <div class="location">
+                    <span>📍</span>
+                    <span>Portela de Sintra</span>
+                </div>
+                
+                <div class="cta">Register Interest</div>
+            </div>
+        </div>
+
+        <!-- PORTUGUESE VERSION -->
+        <div id="tiktokImagePT" data-lang="pt">
+            <!-- Background pattern -->
+            <div class="bg-pattern">
+                <div class="emoji-float emoji-1">🎮</div>
+                <div class="emoji-float emoji-2">🎲</div>
+                <div class="emoji-float emoji-3">🃏</div>
+                <div class="emoji-float emoji-4">🧙‍♂️</div>
+                <div class="emoji-float emoji-5">⚡</div>
+                <div class="emoji-float emoji-6">🔥</div>
+            </div>
+
+            <!-- Main content -->
+            <div class="content-wrapper">
+                <div class="emoji-header">🔥 🎮 🧙‍♂️</div>
+                
+                <div class="badge">EM BREVE</div>
+                
+                <h1 class="main-title">Sintra<br>Game &<br>Maker Hub</h1>
+                
+                <p class="tagline">por jogadores, para jogadores</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🃏</div>
+                        <div class="feature-text">Eventos TCG</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎲</div>
+                        <div class="feature-text">Jogos de Tabuleiro</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🖨️</div>
+                        <div class="feature-text">Impressão 3D</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔧</div>
+                        <div class="feature-text">Reparação Tech</div>
+                    </div>
+                </div>
+                
+                <div class="location">
+                    <span>📍</span>
+                    <span>Portela de Sintra</span>
+                </div>
+                
+                <div class="cta">Registar Interesse</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLang = 'en';
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            
+            // Update visible content
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll(`[data-lang="${lang}"]`).forEach(el => {
+                el.classList.add('active');
+            });
+            
+            // Update button styles
+            document.getElementById('langBtn-en').style.background = lang === 'en' ? '#ff8800' : '#ccc';
+            document.getElementById('langBtn-pt').style.background = lang === 'pt' ? '#ff8800' : '#ccc';
+        }
+
+        function showStatus(message, isError = false) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.classList.add('show');
+            status.style.background = isError ? '#ffe8e8' : '#e8f4f8';
+            status.style.borderLeftColor = isError ? '#e74c3c' : '#ff8800';
+            
+            setTimeout(() => {
+                status.classList.remove('show');
+            }, 5000);
+        }
+
+        async function generateCanvas() {
+            const elementId = currentLang === 'en' ? 'tiktokImage' : 'tiktokImagePT';
+            const element = document.getElementById(elementId);
+            
+            try {
+                const canvas = await html2canvas(element, {
+                    width: 1080,
+                    height: 1920,
+                    scale: 2, // Higher quality
+                    backgroundColor: null,
+                    logging: false,
+                    useCORS: true
+                });
+                
+                return canvas;
+            } catch (error) {
+                console.error('Error generating canvas:', error);
+                showStatus('Error generating image. Please try manual screenshot.', true);
+                return null;
+            }
+        }
+
+        async function downloadImage() {
+            showStatus('Generating TikTok image...');
+            
+            const canvas = await generateCanvas();
+            if (!canvas) return;
+            
+            try {
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `sintra-hub-tiktok-${currentLang}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    showStatus(`✅ TikTok image (${currentLang.toUpperCase()}) downloaded! Perfect for TikTok, Instagram Stories & Reels!`);
+                });
+            } catch (error) {
+                console.error('Error downloading:', error);
+                showStatus('Error downloading. Please try manual screenshot.', true);
+            }
+        }
+
+        async function copyToClipboard() {
+            showStatus('Generating TikTok image...');
+            
+            const canvas = await generateCanvas();
+            if (!canvas) return;
+            
+            try {
+                canvas.toBlob(async (blob) => {
+                    try {
+                        await navigator.clipboard.write([
+                            new ClipboardItem({ 'image/png': blob })
+                        ]);
+                        showStatus('✅ Image copied to clipboard! Paste it directly into TikTok or Instagram!');
+                    } catch (err) {
+                        console.error('Clipboard error:', err);
+                        showStatus('Clipboard not supported. Use Download instead.', true);
+                    }
+                });
+            } catch (error) {
+                console.error('Error copying:', error);
+                showStatus('Error copying. Use Download instead.', true);
+            }
+        }
+
+        async function openInNewTab() {
+            showStatus('Generating TikTok image...');
+            
+            const canvas = await generateCanvas();
+            if (!canvas) return;
+            
+            try {
+                const dataUrl = canvas.toDataURL('image/png');
+                const newWindow = window.open();
+                newWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>TikTok Image - Sintra Game & Maker Hub</title>
+                        <style>
+                            body { 
+                                margin: 0; 
+                                display: flex; 
+                                justify-content: center; 
+                                align-items: center; 
+                                min-height: 100vh; 
+                                background: #000;
+                            }
+                            img { 
+                                max-width: 100%; 
+                                max-height: 100vh;
+                                height: auto; 
+                                box-shadow: 0 20px 60px rgba(255,255,255,0.2);
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <img src="${dataUrl}" alt="TikTok Image">
+                    </body>
+                    </html>
+                `);
+                showStatus('✅ Image opened in new tab. Right-click to save!');
+            } catch (error) {
+                console.error('Error opening in new tab:', error);
+                showStatus('Error opening new tab. Use Download instead.', true);
+            }
+        }
+    </script>
+</body>
+</html>
