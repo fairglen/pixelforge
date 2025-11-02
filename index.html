@@ -329,8 +329,8 @@
             </div>
 
             <div class="form-group">
-                <label for="email">Email <span class="required">*</span></label>
-                <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+                <label for="email">Email <span style="color: #666; font-weight: 400;">(optional)</span></label>
+                <input type="email" id="email" name="email" placeholder="your.email@example.com">
             </div>
 
             <!-- Honeypot field (hidden from users, catches bots) -->
@@ -348,8 +348,8 @@
         </div>
 
         <div id="errorMessage" class="error-message">
-            <span class="active-lang" data-lang="en">Please fill in your email and select at least one interest.</span>
-            <span data-lang="pt">Por favor preencha o seu email e selecione pelo menos uma opção.</span>
+            <span class="active-lang" data-lang="en">Please select at least one interest.</span>
+            <span data-lang="pt">Por favor selecione pelo menos uma opção.</span>
         </div>
     </div>
 
@@ -444,22 +444,30 @@
             }
 
             // Validation
-            if (!email || selectedInterests.size === 0) {
+            if (selectedInterests.size === 0) {
+                const errMsg = errorMessage.querySelector(`[data-lang="${currentLang}"]`);
+                if (errMsg) {
+                    errMsg.textContent = currentLang === 'en' 
+                        ? 'Please select at least one interest.'
+                        : 'Por favor selecione pelo menos uma opção.';
+                }
                 errorMessage.classList.add('show');
                 return;
             }
 
-            // Additional email validation (beyond HTML5)
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                const errMsg = errorMessage.querySelector(`[data-lang="${currentLang}"]`);
-                if (errMsg) {
-                    errMsg.textContent = currentLang === 'en' 
-                        ? 'Please enter a valid email address.'
-                        : 'Por favor insira um endereço de email válido.';
+            // Additional email validation (beyond HTML5) - only if provided
+            if (email && email.trim() !== '') {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    const errMsg = errorMessage.querySelector(`[data-lang="${currentLang}"]`);
+                    if (errMsg) {
+                        errMsg.textContent = currentLang === 'en' 
+                            ? 'Please enter a valid email address.'
+                            : 'Por favor insira um endereço de email válido.';
+                    }
+                    errorMessage.classList.add('show');
+                    return;
                 }
-                errorMessage.classList.add('show');
-                return;
             }
 
             // Update last submit time
@@ -481,7 +489,7 @@
 
             // Prepare data for Google Sheets
             const formData = {
-                email: email,
+                email: email && email.trim() !== '' ? email : 'Not provided',
                 interests: Array.from(selectedInterests).join(', '),
                 language: currentLang,
                 timestamp: new Date().toISOString(),

@@ -70,20 +70,22 @@ function doPost(e) {
  * Validate incoming data
  */
 function validateData(data) {
-  // Check if required fields exist
-  if (!data.email || !data.interests || !data.language || !data.timestamp) {
+  // Check if required fields exist (email is now optional)
+  if (!data.interests || !data.language || !data.timestamp) {
     return { valid: false, error: 'Missing required fields' };
   }
   
-  // Validate email format
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(data.email)) {
-    return { valid: false, error: 'Invalid email format' };
-  }
-  
-  // Validate email length
-  if (data.email.length > CONFIG.MAX_EMAIL_LENGTH) {
-    return { valid: false, error: 'Email too long' };
+  // Validate email format only if provided
+  if (data.email && data.email !== 'Not provided') {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) {
+      return { valid: false, error: 'Invalid email format' };
+    }
+    
+    // Validate email length
+    if (data.email.length > CONFIG.MAX_EMAIL_LENGTH) {
+      return { valid: false, error: 'Email too long' };
+    }
   }
   
   // Validate interests length
@@ -110,8 +112,14 @@ function validateData(data) {
 
 /**
  * Check rate limiting for an email address
+ * Skip if no email provided
  */
 function checkRateLimit(email) {
+  // Skip rate limiting if no email provided
+  if (!email || email === 'Not provided') {
+    return { allowed: true };
+  }
+  
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const data = sheet.getDataRange().getValues();
   
@@ -189,7 +197,7 @@ function verifyRecaptcha(token) {
 function sanitizeData(data) {
   return {
     timestamp: new Date(data.timestamp),
-    email: data.email.trim().toLowerCase(),
+    email: data.email && data.email !== 'Not provided' ? data.email.trim().toLowerCase() : 'Not provided',
     interests: data.interests.trim().replace(/[<>]/g, ''), // Remove < and >
     language: data.language.trim(),
     userAgent: (data.userAgent || 'Not provided').substring(0, 200)
