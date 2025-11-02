@@ -79,88 +79,87 @@
     }
   }
   
-  /* Each poster takes half the page */
+  /* Each poster takes a full page */
   .poster{
-    max-width: 100%;
     margin: 0;
-    padding: 16px 20px;
-    display: grid;
-    grid-template-rows: auto auto auto;
-    gap: 8px;
-    min-height: 45vh; /* Half page for each language */
-    page-break-inside: avoid;
-    page-break-after: avoid;
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 100vh;
+    box-sizing: border-box;
+    background: var(--bg);
   }
-
-  /* Scissors divider */
-  .divider{
-    text-align: center;
-    margin: 8px 0;
-    padding: 5px 0;
-    border-top: 2px dashed var(--ink);
-    border-bottom: 2px dashed var(--ink);
-    font-size: 22px;
-    letter-spacing: 12px;
-    opacity: 0.6;
-    page-break-inside: avoid;
-    page-break-after: avoid;
+  
+  .poster header {
+    flex-shrink: 0;
   }
-  .divider::after{
-    content: "✂";
-    font-size: 28px;
+  
+  /* White background for both posters when toggled */
+  body.white-bg .poster {
+    background: white !important;
   }
 
   /* Header emoji strip */
   .icons{
-    font-size: clamp(22px, 3.5vw, 32px);
-    letter-spacing: .15em;
+    font-size: clamp(40px, 5vw, 56px);
+    letter-spacing: .25em;
     text-align: center;
-    margin-bottom: 6px;
+    margin: 0;
   }
 
   h1{
-    font-size: clamp(26px, 5vw, 44px);
-    line-height: 1.05;
-    margin: 0 0 8px 0;
+    font-size: clamp(48px, 7vw, 68px);
+    line-height: 1.1;
+    margin: 15px 0 20px 0;
     font-weight: 900;
     text-align: center;
   }
   
   h2{
-    font-size: clamp(18px, 3.8vw, 28px);
-    margin: 0 0 6px 0;
+    font-size: clamp(32px, 5.5vw, 44px);
+    margin: 0 0 15px 0;
     font-weight: 700;
     text-align: center;
-    line-height: 1.2;
+    line-height: 1.3;
   }
   
   p{ 
-    font-size: clamp(14px, 2.3vw, 18px); 
-    margin: 6px 0;
-    line-height: 1.35;
+    font-size: clamp(22px, 3.5vw, 28px); 
+    margin: 10px 0;
+    line-height: 1.5;
   }
 
   .bullets{
     text-align: center;
-    margin: 4px 0 10px 0;
+    margin: 10px 0 15px 0;
     font-weight: 600;
-    font-size: clamp(14px, 2.3vw, 18px);
+    font-size: clamp(22px, 3.5vw, 28px);
   }
   
   .content{
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 20px;
     text-align: center;
+  }
+  
+  .qr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin: 0;
   }
   
   .scan{
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    margin: 8px 0;
+    gap: 15px;
+    margin: 15px 0;
     text-align: center;
   }
   
@@ -170,23 +169,23 @@
   
   .scan p{ 
     font-weight: 700; 
-    font-size: clamp(15px, 2.5vw, 19px);
+    font-size: clamp(20px, 3vw, 26px);
     margin: 0;
     text-align: center;
   }
   
   .qr{
-    width: 150px; 
-    height: 150px;
+    width: 200px; 
+    height: 200px;
     background: #fff;
-    border: 4px solid var(--ink);
-    border-radius: 6px;
+    border: 5px solid var(--ink);
+    border-radius: 8px;
     flex-shrink: 0;
   }
   
   .tagline {
     text-align: center;
-    margin-top: 6px;
+    margin-top: 10px;
   }
   
   .footer{
@@ -204,45 +203,52 @@
 
   /* Print optimizations */
   @media print{
-    body { 
-      background: var(--bg);
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
+    @page {
+      size: A4 portrait;
+      margin: 0;
     }
     
-    body.white-bg {
-      background: white !important;
+    html, body { 
+      margin: 0;
+      padding: 0;
+      background: none;
+      height: 100%;
     }
     
     .poster{ 
-      padding: 14px 18px;
-      gap: 6px;
-      min-height: 0;
-      height: auto;
+      padding: 70px 50px;
+      background: var(--bg);
+      page-break-after: always;
+      page-break-inside: avoid;
+      break-after: page;
+      break-inside: avoid;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+    
+    .poster:last-child {
       page-break-after: avoid;
-      page-break-before: avoid;
+      break-after: avoid;
     }
-    .divider{ 
-      margin: 6px 0; 
-      padding: 4px 0;
-      page-break-after: avoid;
-      page-break-before: avoid;
+    
+    body.white-bg .poster {
+      background: white !important;
     }
-    .qr{ 
-      width: 140px; 
-      height: 140px;
-      border-width: 3px;
-    }
-    .scan{ gap: 8px; margin: 6px 0; }
-    h1{ font-size: 38px; line-height: 1.05; margin-bottom: 8px; }
-    h2{ font-size: 25px; margin-bottom: 6px; }
-    p{ font-size: 16px; margin: 5px 0; }
-    .bullets{ font-size: 16px; margin: 4px 0 8px 0; }
-    .scan p{ font-size: 17px; }
-    .footer{ font-size: 14px; padding-top: 6px; margin-top: 8px; }
-    .icons{ font-size: 28px; margin-bottom: 6px; }
-    .content{ gap: 8px; }
+    
+    /* Larger sizes for print to fill page */
+    .icons{ font-size: 52px; margin: 0; }
+    h1{ font-size: 60px; line-height: 1.1; margin: 20px 0 25px 0; }
+    h2{ font-size: 40px; margin-bottom: 20px; line-height: 1.3; }
+    p{ font-size: 26px; margin: 12px 0; line-height: 1.5; }
+    .bullets{ font-size: 26px; margin: 15px 0 10px 0; }
+    .scan-text p{ font-size: 26px; }
+    .qr{ width: 190px; height: 190px; border-width: 5px; }
+    .content{ gap: 20px; }
+    .qr-container{ gap: 15px; margin: 0; }
+    .tagline{ margin-top: 5px; font-size: 26px; }
   }
   
   @media screen and (max-width: 600px){
@@ -278,20 +284,18 @@
     </header>
 
     <section class="content">
-      <img class="qr" alt="QR code for interest form"
-           src="https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=10&data=https://fairglen.github.io/pixelforge/" />
-      
-      <div class="scan-text">
-        <p>👉 Scan the code and tell us what you'd love to see!</p>
+      <div class="qr-container">
+        <img class="qr" alt="QR code for interest form"
+             src="https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=10&data=https://fairglen.github.io/pixelforge/" />
+        <div class="scan-text">
+          <p>👉 Scan the code and tell us what you'd love to see!</p>
+        </div>
       </div>
       
       <p class="tagline">🧩 <strong>Sintra's first Game & Maker Hub</strong><br>
          <em>by players, for players</em></p>
     </section>
   </article>
-
-  <!-- CUT LINE -->
-  <div class="divider" aria-hidden="true"></div>
 
   <!-- PORTUGUESE VERSION -->
   <article class="poster" lang="pt" role="main" aria-label="Sintra Game & Maker Hub poster - Português">
@@ -306,11 +310,12 @@
     </header>
 
     <section class="content">
-      <img class="qr" alt="Código QR para formulário de interesse"
-           src="https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=10&data=https://fairglen.github.io/pixelforge/" />
-      
-      <div class="scan-text">
-        <p>👉 Digitaliza o código e diz-nos o que gostarias de ver!</p>
+      <div class="qr-container">
+        <img class="qr" alt="Código QR para formulário de interesse"
+             src="https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=10&data=https://fairglen.github.io/pixelforge/" />
+        <div class="scan-text">
+          <p>👉 Digitaliza o código e diz-nos o que gostarias de ver!</p>
+        </div>
       </div>
       
       <p class="tagline">🧩 <strong>O primeiro Game & Maker Hub de Sintra</strong><br>
