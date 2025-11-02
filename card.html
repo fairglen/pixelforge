@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sintra Game & Maker Hub - Trading Card</title>
+<style>
+  /* Trading card size: 63mm × 88mm (2.5" × 3.5") with bleed */
+  @page { 
+    size: A4 portrait; 
+    margin: 10mm;
+  }
+  
+  :root{
+    --bg: #ff8800;
+    --ink: #0b0b0b;
+    --card-width: 63mm;
+    --card-height: 88mm;
+  }
+  
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    box-sizing: border-box;
+  }
+  
+  body{
+    margin: 0;
+    padding: 20px;
+    font-family: system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    background: #f0f0f0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10mm;
+    justify-content: center;
+  }
+  
+  /* Control buttons - only visible on screen */
+  .print-controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .print-controls button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 14px;
+  }
+  
+  .print-controls button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  
+  .bg-toggle {
+    background: #ff8800;
+    color: white;
+  }
+  
+  .print-btn {
+    background: #0b0b0b;
+    color: white;
+  }
+  
+  @media print {
+    body {
+      background: white;
+      padding: 5mm;
+      gap: 3mm;
+      max-width: 210mm; /* A4 width */
+    }
+    .print-controls {
+      display: none !important;
+    }
+    .card {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    /* 3 columns layout for print */
+    body {
+      display: grid;
+      grid-template-columns: repeat(3, var(--card-width));
+      justify-content: center;
+      column-gap: 3mm;
+      row-gap: 3mm;
+    }
+  }
+  
+  /* Card styling */
+  .card {
+    width: var(--card-width);
+    height: var(--card-height);
+    background: var(--bg);
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    border-radius: 4mm;
+    padding: 4mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  body.white-bg .card {
+    background: white !important;
+  }
+  
+  .card-header {
+    width: 100%;
+  }
+  
+  .icons {
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    margin-bottom: 2mm;
+  }
+  
+  h1 {
+    font-size: 11px;
+    line-height: 1.1;
+    margin: 0 0 2mm 0;
+    font-weight: 900;
+  }
+  
+  h2 {
+    font-size: 8px;
+    margin: 0 0 1mm 0;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  
+  .bullets {
+    font-size: 6px;
+    font-weight: 600;
+    margin: 1mm 0;
+    line-height: 1.3;
+  }
+  
+  .qr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2mm;
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .qr {
+    width: 35mm;
+    height: 35mm;
+    background: white;
+    border: 1.5px solid var(--ink);
+    border-radius: 2mm;
+    flex-shrink: 0;
+  }
+  
+  .scan-text {
+    font-size: 7px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+  }
+  
+  .tagline {
+    font-size: 6px;
+    margin: 2mm 0 0 0;
+    line-height: 1.3;
+  }
+  
+  .tagline strong {
+    font-weight: 700;
+  }
+  
+  .tagline em {
+    font-style: italic;
+  }
+  
+  /* Print guide lines (optional, comment out for final print) */
+  @media screen {
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border: 1px dashed rgba(255,0,0,0.3);
+      pointer-events: none;
+      border-radius: 4mm;
+    }
+  }
+</style>
+</head>
+<body>
+  <!-- Print Controls (only visible on screen) -->
+  <div class="print-controls">
+    <button class="bg-toggle" onclick="toggleBackground()">
+      🎨 Toggle Background<br>
+      <small id="bg-status">(Orange)</small>
+    </button>
+    <button class="print-btn" onclick="window.print()">
+      🖨️ Print Cards
+    </button>
+    <p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">
+      💡 Cards are 63×88mm<br>
+      Fits standard card sleeves
+    </p>
+  </div>
+
+  <!-- ENGLISH VERSION -->
+  <div class="card" lang="en">
+    <div class="card-header">
+      <div class="icons" aria-hidden="true">🔥🎮🧙‍♂️🃏⚡🎲</div>
+      <h1>Something new is coming<br>to Portela de Sintra!</h1>
+      <h2>A place to play, trade,<br>build & chill</h2>
+      <div class="bullets">
+        Pokémon • Magic • One Piece<br>3D printing • custom gear
+      </div>
+    </div>
+
+    <div class="qr-container">
+      <img class="qr" alt="QR code for interest form"
+           src="https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=10&data=https://tcgsintraquiz.com/" />
+      <p class="scan-text">👉 Scan & share your ideas!</p>
+    </div>
+
+    <div class="tagline">
+      <strong>🧩 Sintra's first<br>Game & Maker Hub</strong><br>
+      <em>by players, for players</em>
+    </div>
+  </div>
+
+  <!-- PORTUGUESE VERSION -->
+  <div class="card" lang="pt">
+    <div class="card-header">
+      <div class="icons" aria-hidden="true">🔥🎮🧙‍♂️🃏⚡🎲</div>
+      <h1>Algo novo está a chegar<br>a Portela de Sintra!</h1>
+      <h2>Um espaço para jogar,<br>trocar, construir & relaxar</h2>
+      <div class="bullets">
+        Pokémon • Magic • One Piece<br>Impressão 3D • acessórios
+      </div>
+    </div>
+
+    <div class="qr-container">
+      <img class="qr" alt="Código QR para formulário de interesse"
+           src="https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=10&data=https://tcgsintraquiz.com/" />
+      <p class="scan-text">👉 Digitaliza & partilha ideias!</p>
+    </div>
+
+    <div class="tagline">
+      <strong>🧩 O primeiro<br>Game & Maker Hub de Sintra</strong><br>
+      <em>por jogadores, para jogadores</em>
+    </div>
+  </div>
+
+  <!-- Duplicate cards for easy printing (9 cards per A4 page) -->
+  <div class="card" lang="en">
+    <div class="card-header">
+      <div class="icons" aria-hidden="true">🔥🎮🧙‍♂️🃏⚡🎲</div>
+      <h1>Something new is coming<br>to Portela de Sintra!</h1>
+      <h2>A place to play, trade,<br>build & chill</h2>
+      <div class="bullets">
+        Pokémon • Magic • One Piece<br>3D printing • custom gear
+      </div>
+    </div>
+    <div class="qr-container">
+      <img class="qr" alt="QR code for interest form"
+           src="https://api.qrserver.com/v1/create-qr-code/?size=350x350&margin=5&data=https://fairglen.github.io/pixelforge/" />
+      <p class="scan-text">👉 Scan & share your ideas!</p>
+    </div>
+    <div class="tagline">
+      <strong>🧩 Sintra's first<br>Game & Maker Hub</strong><br>
+      <em>by players, for players</em>
+    </div>
+  </div>
+
+  <div class="card" lang="pt">
+    <div class="card-header">
+      <div class="icons" aria-hidden="true">🔥🎮🧙‍♂️🃏⚡🎲</div>
+      <h1>Algo novo está a chegar<br>a Portela de Sintra!</h1>
+      <h2>Um espaço para jogar,<br>trocar, construir & relaxar</h2>
+      <div class="bullets">
+        Pokémon • Magic • One Piece<br>Impressão 3D • acessórios
+      </div>
+    </div>
+    <div class="qr-container">
+      <img class="qr" alt="Código QR para formulário de interesse"
+           src="https://api.qrserver.com/v1/create-qr-code/?size=350x350&margin=5&data=https://fairglen.github.io/pixelforge/" />
+      <p class="scan-text">👉 Digitaliza & partilha ideias!</p>
+    </div>
+    <div class="tagline">
+      <strong>🧩 O primeiro<br>Game & Maker Hub de Sintra</strong><br>
+      <em>por jogadores, para jogadores</em>
+    </div>
+  </div>
+
+  <div class="card" lang="en">
+    <div class="card-header">
+      <div class="icons" aria-hidden="true">🔥🎮🧙‍♂️🃏⚡🎲</div>
+      <h1>Something new is coming<br>to Portela de Sintra!</h1>
+      <h2>A place to play, trade,<br>build & chill</h2>
+      <div class="bullets">
+        Pokémon • Magic • One Piece<br>3D printing • custom gear
+      </div>
+    </div>
+    <div class="qr-container">
+      <img class="qr" alt="QR code for interest form"
+           src="https://api.qrserver.com/v1/create-qr-code/?size=350x350&margin=5&data=https://fairglen.github.io/pixelforge/" />
+      <p class="scan-text">👉 Scan & share your ideas!</p>
+    </div>
+    <div class="tagline">
+      <strong>🧩 Sintra's first<br>Game & Maker Hub</strong><br>
+      <em>by players, for players</em>
+    </div>
+  </div>
+
+  <div class="card" lang="pt">
+    <div class="card-header">
+      <div class="icons" aria-hidden="true">🔥🎮🧙‍♂️🃏⚡🎲</div>
+      <h1>Algo novo está a chegar<br>a Portela de Sintra!</h1>
+      <h2>Um espaço para jogar,<br>trocar, construir & relaxar</h2>
+      <div class="bullets">
+        Pokémon • Magic • One Piece<br>Impressão 3D • acessórios
+      </div>
+    </div>
+    <div class="qr-container">
+      <img class="qr" alt="Código QR para formulário de interesse"
+           src="https://api.qrserver.com/v1/create-qr-code/?size=350x350&margin=5&data=https://fairglen.github.io/pixelforge/" />
+      <p class="scan-text">👉 Digitaliza & partilha ideias!</p>
+    </div>
+    <div class="tagline">
+      <strong>🧩 O primeiro<br>Game & Maker Hub de Sintra</strong><br>
+      <em>por jogadores, para jogadores</em>
+    </div>
+  </div>
+
+  <div class="card" lang="en">
+    <div class="card-header">
+      <div class="icons" aria-hidden="true">🔥🎮🧙‍♂️🃏⚡🎲</div>
+      <h1>Something new is coming<br>to Portela de Sintra!</h1>
+      <h2>A place to play, trade,<br>build & chill</h2>
+      <div class="bullets">
+        Pokémon • Magic • One Piece<br>3D printing • custom gear
+      </div>
+    </div>
+    <div class="qr-container">
+      <img class="qr" alt="QR code for interest form"
+           src="https://api.qrserver.com/v1/create-qr-code/?size=350x350&margin=5&data=https://fairglen.github.io/pixelforge/" />
+      <p class="scan-text">👉 Scan & share your ideas!</p>
+    </div>
+    <div class="tagline">
+      <strong>🧩 Sintra's first<br>Game & Maker Hub</strong><br>
+      <em>by players, for players</em>
+    </div>
+  </div>
+
+  <div class="card" lang="pt">
+    <div class="card-header">
+      <div class="icons" aria-hidden="true">🔥🎮🧙‍♂️🃏⚡🎲</div>
+      <h1>Algo novo está a chegar<br>a Portela de Sintra!</h1>
+      <h2>Um espaço para jogar,<br>trocar, construir & relaxar</h2>
+      <div class="bullets">
+        Pokémon • Magic • One Piece<br>Impressão 3D • acessórios
+      </div>
+    </div>
+    <div class="qr-container">
+      <img class="qr" alt="Código QR para formulário de interesse"
+           src="https://api.qrserver.com/v1/create-qr-code/?size=350x350&margin=5&data=https://fairglen.github.io/pixelforge/" />
+      <p class="scan-text">👉 Digitaliza & partilha ideias!</p>
+    </div>
+    <div class="tagline">
+      <strong>🧩 O primeiro<br>Game & Maker Hub de Sintra</strong><br>
+      <em>por jogadores, para jogadores</em>
+    </div>
+  </div>
+
+  <script>
+    function toggleBackground() {
+      const body = document.body;
+      const status = document.getElementById('bg-status');
+      
+      body.classList.toggle('white-bg');
+      
+      if (body.classList.contains('white-bg')) {
+        status.textContent = '(White - for orange paper)';
+      } else {
+        status.textContent = '(Orange)';
+      }
+    }
+  </script>
+</body>
+</html>
