@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 
 <head>
     <meta charset="UTF-8">
@@ -356,7 +356,7 @@
     <script>
         // Language toggle with dropdown
         const langSelect = document.getElementById('langSelect');
-        let currentLang = 'en';
+        let currentLang = 'pt'; // Default to Portuguese
 
         function setLanguage(lang) {
             currentLang = lang;
@@ -376,10 +376,12 @@
             localStorage.setItem('preferredLang', lang);
         }
 
-        // Load saved language preference
+        // Load saved language preference, default to Portuguese
         const savedLang = localStorage.getItem('preferredLang');
         if (savedLang && (savedLang === 'en' || savedLang === 'pt')) {
             setLanguage(savedLang);
+        } else {
+            setLanguage('pt'); // Set Portuguese as default
         }
 
         langSelect.addEventListener('change', (e) => {
