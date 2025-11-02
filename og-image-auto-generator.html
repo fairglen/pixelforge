@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OG Image Auto-Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+
+        .controls {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .controls h2 {
+            color: #ff8800;
+            margin-bottom: 15px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #ff8800;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #ff6600;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .preview-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .preview-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        /* OG Image Canvas - Exact 1200x630px */
+        #ogImage {
+            width: 1200px;
+            height: 630px;
+            background: linear-gradient(135deg, #ff8800 0%, #ff6600 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .emoji-header {
+            font-size: 80px;
+            letter-spacing: 20px;
+            margin-bottom: 30px;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .main-title {
+            font-size: 72px;
+            font-weight: 900;
+            color: white;
+            text-align: center;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 36px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.95);
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .tagline {
+            font-size: 28px;
+            font-weight: 600;
+            color: white;
+            text-align: center;
+            font-style: italic;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .features {
+            display: flex;
+            gap: 30px;
+            margin-top: 30px;
+            font-size: 24px;
+            color: white;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Decorative elements */
+        .corner-decoration {
+            position: absolute;
+            font-size: 120px;
+            opacity: 0.1;
+        }
+
+        .top-left {
+            top: 20px;
+            left: 20px;
+        }
+
+        .top-right {
+            top: 20px;
+            right: 20px;
+        }
+
+        .bottom-left {
+            bottom: 20px;
+            left: 20px;
+        }
+
+        .bottom-right {
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e8f4f8;
+            border-left: 4px solid #ff8800;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        /* Scale preview for smaller screens */
+        @media (max-width: 1280px) {
+            #ogImage {
+                transform: scale(0.8);
+                transform-origin: top center;
+            }
+            .preview-container {
+                overflow: hidden;
+            }
+        }
+
+        @media (max-width: 1000px) {
+            #ogImage {
+                transform: scale(0.6);
+            }
+        }
+
+        @media (max-width: 768px) {
+            #ogImage {
+                transform: scale(0.4);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h2>🎨 OG Image Generator</h2>
+        <p style="margin-bottom: 15px; color: #666;">
+            Generate a perfect 1200x630px Open Graph image for social media sharing.
+        </p>
+        <div class="button-group">
+            <button onclick="downloadImage()">📥 Download Image</button>
+            <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+            <button onclick="openInNewTab()">🔗 Open in New Tab</button>
+        </div>
+        <div id="status" class="status"></div>
+    </div>
+
+    <div class="preview-container">
+        <div class="preview-label">Preview (1200x630px):</div>
+        <div id="ogImage">
+            <!-- Decorative corners -->
+            <div class="corner-decoration top-left">🎮</div>
+            <div class="corner-decoration top-right">🎲</div>
+            <div class="corner-decoration bottom-left">🃏</div>
+            <div class="corner-decoration bottom-right">🧙‍♂️</div>
+
+            <!-- Main content -->
+            <div class="emoji-header">🔥 🎮 🧙‍♂️ 🃏 ⚡ 🎲</div>
+            
+            <h1 class="main-title">Sintra Game<br>& Maker Hub</h1>
+            
+            <p class="subtitle">Coming to Portela de Sintra</p>
+            
+            <p class="tagline">by players, for players</p>
+            
+            <div class="features">
+                <div class="feature-item">
+                    <span>🃏</span>
+                    <span>TCG</span>
+                </div>
+                <div class="feature-item">
+                    <span>🎲</span>
+                    <span>Board Games</span>
+                </div>
+                <div class="feature-item">
+                    <span>🖨️</span>
+                    <span>3D Printing</span>
+                </div>
+                <div class="feature-item">
+                    <span>🔧</span>
+                    <span>Tech Repair</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showStatus(message, isError = false) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.classList.add('show');
+            status.style.background = isError ? '#ffe8e8' : '#e8f4f8';
+            status.style.borderLeftColor = isError ? '#e74c3c' : '#ff8800';
+            
+            setTimeout(() => {
+                status.classList.remove('show');
+            }, 5000);
+        }
+
+        async function generateCanvas() {
+            const element = document.getElementById('ogImage');
+            
+            try {
+                const canvas = await html2canvas(element, {
+                    width: 1200,
+                    height: 630,
+                    scale: 2, // Higher quality
+                    backgroundColor: null,
+                    logging: false,
+                    useCORS: true
+                });
+                
+                return canvas;
+            } catch (error) {
+                console.error('Error generating canvas:', error);
+                showStatus('Error generating image. Please try manual screenshot.', true);
+                return null;
+            }
+        }
+
+        async function downloadImage() {
+            showStatus('Generating image...');
+            
+            const canvas = await generateCanvas();
+            if (!canvas) return;
+            
+            try {
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'og-image.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    showStatus('✅ Image downloaded! Save it to your repository as "og-image.png"');
+                });
+            } catch (error) {
+                console.error('Error downloading:', error);
+                showStatus('Error downloading. Please try manual screenshot.', true);
+            }
+        }
+
+        async function copyToClipboard() {
+            showStatus('Generating image...');
+            
+            const canvas = await generateCanvas();
+            if (!canvas) return;
+            
+            try {
+                canvas.toBlob(async (blob) => {
+                    try {
+                        await navigator.clipboard.write([
+                            new ClipboardItem({ 'image/png': blob })
+                        ]);
+                        showStatus('✅ Image copied to clipboard! Paste it into your image editor.');
+                    } catch (err) {
+                        console.error('Clipboard error:', err);
+                        showStatus('Clipboard not supported. Use Download instead.', true);
+                    }
+                });
+            } catch (error) {
+                console.error('Error copying:', error);
+                showStatus('Error copying. Use Download instead.', true);
+            }
+        }
+
+        async function openInNewTab() {
+            showStatus('Generating image...');
+            
+            const canvas = await generateCanvas();
+            if (!canvas) return;
+            
+            try {
+                const dataUrl = canvas.toDataURL('image/png');
+                const newWindow = window.open();
+                newWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>OG Image - Sintra Game & Maker Hub</title>
+                        <style>
+                            body { 
+                                margin: 0; 
+                                display: flex; 
+                                justify-content: center; 
+                                align-items: center; 
+                                min-height: 100vh; 
+                                background: #f0f0f0;
+                            }
+                            img { 
+                                max-width: 100%; 
+                                height: auto; 
+                                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <img src="${dataUrl}" alt="OG Image">
+                    </body>
+                    </html>
+                `);
+                showStatus('✅ Image opened in new tab. Right-click to save.');
+            } catch (error) {
+                console.error('Error opening in new tab:', error);
+                showStatus('Error opening new tab. Use Download instead.', true);
+            }
+        }
+    </script>
+</body>
+</html>
