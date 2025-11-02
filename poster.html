@@ -8,7 +8,7 @@
   /* Print-friendly A4 poster - Two languages on one page */
   @page { 
     size: A4 portrait; 
-    margin: 8mm;
+    margin: 0; /* Remove white border */
   }
   
   :root{
@@ -29,32 +29,85 @@
     background:var(--bg);
   }
   
+  /* Toggle for white background (for orange paper printing) */
+  body.white-bg {
+    background: white;
+  }
+  
+  /* Control buttons - only visible on screen */
+  .print-controls {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .print-controls button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .print-controls button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  
+  .bg-toggle {
+    background: #ff8800;
+    color: white;
+  }
+  
+  .print-btn {
+    background: #0b0b0b;
+    color: white;
+  }
+  
+  @media print {
+    .print-controls {
+      display: none !important;
+    }
+  }
+  
   /* Each poster takes half the page */
   .poster{
-    max-width: 750px;
-    margin: 0 auto;
-    padding: 20px;
+    max-width: 100%;
+    margin: 0;
+    padding: 16px 20px;
     display: grid;
-    grid-template-rows: auto auto 1fr auto;
-    gap: 12px;
-    min-height: 48vh; /* Half page for each language */
+    grid-template-rows: auto auto auto;
+    gap: 8px;
+    min-height: 45vh; /* Half page for each language */
     page-break-inside: avoid;
+    page-break-after: avoid;
   }
 
   /* Scissors divider */
   .divider{
     text-align: center;
-    margin: 16px 0;
-    padding: 8px 0;
+    margin: 8px 0;
+    padding: 5px 0;
     border-top: 2px dashed var(--ink);
     border-bottom: 2px dashed var(--ink);
-    font-size: 24px;
+    font-size: 22px;
     letter-spacing: 12px;
     opacity: 0.6;
+    page-break-inside: avoid;
+    page-break-after: avoid;
   }
   .divider::after{
     content: "✂";
-    font-size: 32px;
+    font-size: 28px;
   }
 
   /* Header emoji strip */
@@ -62,66 +115,78 @@
     font-size: clamp(22px, 3.5vw, 32px);
     letter-spacing: .15em;
     text-align: center;
+    margin-bottom: 6px;
   }
 
   h1{
-    font-size: clamp(24px, 5vw, 42px);
-    line-height: 1.1;
-    margin: 0;
+    font-size: clamp(26px, 5vw, 44px);
+    line-height: 1.05;
+    margin: 0 0 8px 0;
     font-weight: 900;
     text-align: center;
   }
   
   h2{
-    font-size: clamp(17px, 3.8vw, 26px);
-    margin: 4px 0 0;
+    font-size: clamp(18px, 3.8vw, 28px);
+    margin: 0 0 6px 0;
     font-weight: 700;
     text-align: center;
+    line-height: 1.2;
   }
   
   p{ 
-    font-size: clamp(13px, 2.2vw, 17px); 
-    margin: 0;
-    line-height: 1.4;
+    font-size: clamp(14px, 2.3vw, 18px); 
+    margin: 6px 0;
+    line-height: 1.35;
   }
 
   .bullets{
     text-align: center;
-    margin-top: 8px;
+    margin: 4px 0 10px 0;
     font-weight: 600;
-    font-size: clamp(13px, 2.2vw, 17px);
+    font-size: clamp(14px, 2.3vw, 18px);
   }
   
   .content{
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 10px;
+    text-align: center;
   }
   
   .scan{
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    margin-top: 8px;
+    gap: 10px;
+    margin: 8px 0;
+    text-align: center;
   }
   
   .scan-text{
-    flex: 1;
+    width: 100%;
   }
   
   .scan p{ 
     font-weight: 700; 
-    font-size: clamp(14px, 2.4vw, 18px);
+    font-size: clamp(15px, 2.5vw, 19px);
+    margin: 0;
+    text-align: center;
   }
   
   .qr{
-    width: 140px; 
-    height: 140px;
+    width: 150px; 
+    height: 150px;
     background: #fff;
     border: 4px solid var(--ink);
     border-radius: 6px;
     flex-shrink: 0;
+  }
+  
+  .tagline {
+    text-align: center;
+    margin-top: 6px;
   }
   
   .footer{
@@ -131,41 +196,56 @@
     gap: 10px;
     flex-wrap: wrap;
     border-top: 2px solid var(--ink);
-    padding-top: 8px;
-    margin-top: 10px;
+    padding-top: 6px;
+    margin-top: 8px;
     font-weight: 600;
     font-size: clamp(12px, 2vw, 15px);
   }
 
   /* Print optimizations */
   @media print{
-    body { background: var(--bg); }
-    .poster{ 
-      padding: 16px;
-      gap: 10px;
-      min-height: 46vh;
+    body { 
+      background: var(--bg);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
-    .divider{ margin: 12px 0; padding: 6px 0; }
+    
+    body.white-bg {
+      background: white !important;
+    }
+    
+    .poster{ 
+      padding: 14px 18px;
+      gap: 6px;
+      min-height: 0;
+      height: auto;
+      page-break-after: avoid;
+      page-break-before: avoid;
+    }
+    .divider{ 
+      margin: 6px 0; 
+      padding: 4px 0;
+      page-break-after: avoid;
+      page-break-before: avoid;
+    }
     .qr{ 
-      width: 130px; 
-      height: 130px;
+      width: 140px; 
+      height: 140px;
       border-width: 3px;
     }
-    .scan{ gap: 12px; }
-    h1{ font-size: 38px; }
-    h2{ font-size: 24px; }
-    p{ font-size: 16px; }
-    .bullets{ font-size: 16px; }
+    .scan{ gap: 8px; margin: 6px 0; }
+    h1{ font-size: 38px; line-height: 1.05; margin-bottom: 8px; }
+    h2{ font-size: 25px; margin-bottom: 6px; }
+    p{ font-size: 16px; margin: 5px 0; }
+    .bullets{ font-size: 16px; margin: 4px 0 8px 0; }
     .scan p{ font-size: 17px; }
-    .footer{ font-size: 14px; }
-    .icons{ font-size: 28px; }
+    .footer{ font-size: 14px; padding-top: 6px; margin-top: 8px; }
+    .icons{ font-size: 28px; margin-bottom: 6px; }
+    .content{ gap: 8px; }
   }
   
   @media screen and (max-width: 600px){
-    .scan{
-      flex-direction: column;
-      text-align: center;
-    }
     .qr{
       width: 180px;
       height: 180px;
@@ -174,6 +254,17 @@
 </style>
 </head>
 <body>
+  <!-- Print Controls (only visible on screen) -->
+  <div class="print-controls">
+    <button class="bg-toggle" onclick="toggleBackground()">
+      🎨 Toggle Background<br>
+      <small id="bg-status">(Orange)</small>
+    </button>
+    <button class="print-btn" onclick="window.print()">
+      🖨️ Print Poster
+    </button>
+  </div>
+
   <!-- ENGLISH VERSION -->
   <article class="poster" lang="en" role="main" aria-label="Sintra Game & Maker Hub poster - English">
     <div class="icons" aria-hidden="true">🔥 🎮 🧙‍♂️ 🃏 ⚡ 🎲</div>
@@ -182,22 +273,19 @@
       <h1>Something new is coming<br>to Portela de Sintra!</h1>
       <h2>A place to play, trade, build & chill</h2>
       <div class="bullets">
-        Magic • Pokémon • One Piece • 3D printing • custom gear
+        Pokémon • Magic • One Piece • 3D printing • custom gear
       </div>
     </header>
 
     <section class="content">
-      <p>🎯 <strong>We're building it — wanna help shape it?</strong></p>
+      <img class="qr" alt="QR code for interest form"
+           src="https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=10&data=https://fairglen.github.io/pixelforge/" />
       
-      <div class="scan">
-        <div class="scan-text">
-          <p>👉 Scan the code and tell us what you'd love to see!</p>
-        </div>
-        <img class="qr" alt="QR code for interest form"
-             src="https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=10&data=https://fairglen.github.io/pixelforge/" />
+      <div class="scan-text">
+        <p>👉 Scan the code and tell us what you'd love to see!</p>
       </div>
-
-      <p>🧩 <strong>Sintra's first Game & Maker Hub</strong><br>
+      
+      <p class="tagline">🧩 <strong>Sintra's first Game & Maker Hub</strong><br>
          <em>by players, for players</em></p>
     </section>
   </article>
@@ -213,24 +301,36 @@
       <h1>Algo novo está a chegar<br>a Portela de Sintra!</h1>
       <h2>Um espaço para jogar, trocar, construir & relaxar</h2>
       <div class="bullets">
-        Magic • Pokémon • One Piece • Impressão 3D • acessórios personalizados
+        Pokémon • Magic • One Piece • Impressão 3D • acessórios personalizados
       </div>
     </header>
 
     <section class="content">
-      <p>🎯 <strong>Estamos a construir — queres ajudar a moldar?</strong></p>
+      <img class="qr" alt="Código QR para formulário de interesse"
+           src="https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=10&data=https://fairglen.github.io/pixelforge/" />
       
-      <div class="scan">
-        <div class="scan-text">
-          <p>👉 Digitaliza o código e diz-nos o que gostarias de ver!</p>
-        </div>
-        <img class="qr" alt="Código QR para formulário de interesse"
-             src="https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=10&data=https://fairglen.github.io/pixelforge/" />
+      <div class="scan-text">
+        <p>👉 Digitaliza o código e diz-nos o que gostarias de ver!</p>
       </div>
-
-      <p>🧩 <strong>O primeiro Game & Maker Hub de Sintra</strong><br>
+      
+      <p class="tagline">🧩 <strong>O primeiro Game & Maker Hub de Sintra</strong><br>
          <em>por jogadores, para jogadores</em></p>
     </section>
   </article>
+
+  <script>
+    function toggleBackground() {
+      const body = document.body;
+      const status = document.getElementById('bg-status');
+      
+      body.classList.toggle('white-bg');
+      
+      if (body.classList.contains('white-bg')) {
+        status.textContent = '(White - for orange paper)';
+      } else {
+        status.textContent = '(Orange)';
+      }
+    }
+  </script>
 </body>
 </html>
