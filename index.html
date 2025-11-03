@@ -292,7 +292,7 @@
             O primeiro Game & Maker Hub de Sintra — por jogadores, para jogadores.
         </p>
 
-        <form id="interestForm" data-sheet-url="https://script.google.com/macros/s/AKfycbze5tD0wNu5FEiixWj_IvH_hafr0Cs1-8m2Buj-wkaE6xBf2pwpc923jzJHtdlGm-oLqg/exec">
+        <form id="interestForm" data-sheet-url="https://script.google.com/macros/s/AKfycbyK2807zGtK9hOQ-0xdSRgyz9lWBKVCzFkS3x8MjCoI1xBgkGLceZCPwIPQMEOLKRZexw/exec">
             <div class="interest-section">
                 <h3 class="active-lang" data-lang="en">What interests you? (Select all that apply)</h3>
                 <h3 data-lang="pt">O que te interessa? (Selecione todas as opções)</h3>
@@ -354,6 +354,18 @@
     </div>
 
     <script>
+        // Capture traffic source on page load
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const source = urlParams.get('source') || urlParams.get('utm_source') || urlParams.get('utm_medium');
+            
+            // Store source in sessionStorage (persists during the session)
+            if (source && !sessionStorage.getItem('trafficSource')) {
+                sessionStorage.setItem('trafficSource', source);
+                console.log('Traffic source captured:', source);
+            }
+        })();
+
         // Language toggle with dropdown
         const langSelect = document.getElementById('langSelect');
         let currentLang = 'pt'; // Default to Portuguese
@@ -489,6 +501,10 @@
                 }
             }
 
+            // Capture traffic source from URL parameters or sessionStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            const source = urlParams.get('source') || urlParams.get('utm_source') || sessionStorage.getItem('trafficSource') || 'qr-direct';
+
             // Prepare data for Google Sheets
             const formData = {
                 email: email && email.trim() !== '' ? email : 'Not provided',
@@ -496,6 +512,7 @@
                 language: currentLang,
                 timestamp: new Date().toISOString(),
                 userAgent: navigator.userAgent.substring(0, 200), // Limit length for security
+                source: source, // Track where the user came from
                 recaptchaToken: recaptchaToken
             };
 

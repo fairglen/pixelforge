@@ -54,6 +54,7 @@ function doPost(e) {
       sanitizedData.email,
       sanitizedData.interests,
       sanitizedData.language,
+      sanitizedData.source,
       sanitizedData.userAgent
     ]);
     
@@ -200,6 +201,7 @@ function sanitizeData(data) {
     email: data.email && data.email !== 'Not provided' ? data.email.trim().toLowerCase() : 'Not provided',
     interests: data.interests.trim().replace(/[<>]/g, ''), // Remove < and >
     language: data.language.trim(),
+    source: (data.source || 'qr-direct').trim().substring(0, 50), // Track traffic source
     userAgent: (data.userAgent || 'Not provided').substring(0, 200)
   };
 }
@@ -233,8 +235,8 @@ function setupSpreadsheet() {
   
   // Check if headers already exist
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['Timestamp', 'Email', 'Interests', 'Language', 'User Agent']);
-    sheet.getRange(1, 1, 1, 5).setFontWeight('bold');
+    sheet.appendRow(['Timestamp', 'Email', 'Interests', 'Language', 'Source', 'User Agent']);
+    sheet.getRange(1, 1, 1, 6).setFontWeight('bold');
     sheet.setFrozenRows(1);
   }
 }
