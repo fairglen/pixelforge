@@ -11,7 +11,8 @@ const CONFIG = {
   RATE_LIMIT_MINUTES: 5, // Minutes to check for duplicate submissions
   MAX_SUBMISSIONS_PER_EMAIL: 3, // Max submissions from same email in rate limit window
   RECAPTCHA_SECRET_KEY: '', // Add your reCAPTCHA secret key here (optional)
-  RECAPTCHA_MIN_SCORE: 0.5 // Minimum score to accept (0.0 = bot, 1.0 = human)
+  RECAPTCHA_MIN_SCORE: 0.5, // Minimum score to accept (0.0 = bot, 1.0 = human)
+  SHEET_NAME: 'responses' // Change this to your actual sheet name (e.g., 'Responses', 'Form Data', etc.)
 };
 
 /**
@@ -42,11 +43,22 @@ function doPost(e) {
       return createErrorResponse('Too many submissions. Please try again later.');
     }
     
-    // Get the active spreadsheet
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    // Get the correct sheet by name (not active sheet)
+    const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = spreadsheet.getSheetByName(CONFIG.SHEET_NAME);
+    
+    // If sheet doesn't exist, use the first sheet
+    if (!sheet) {
+      sheet = spreadsheet.getSheets()[0];
+      console.log('Sheet not found, using first sheet: ' + sheet.getName());
+    }
     
     // Sanitize and prepare data
     const sanitizedData = sanitizeData(data);
+    
+    // Log what we're about to append (for debugging)
+    console.log('Appending data to sheet: ' + sheet.getName());
+    console.log('Data: ' + JSON.stringify(sanitizedData));
     
     // Append the data to the sheet
     sheet.appendRow([
@@ -62,7 +74,7 @@ function doPost(e) {
     return createSuccessResponse();
     
   } catch (error) {
-    Logger.log('Error in doPost: ' + error.toString());
+    console.log('Error in doPost: ' + error.toString());
     return createErrorResponse('Server error. Please try again later.');
   }
 }
@@ -121,7 +133,14 @@ function checkRateLimit(email) {
     return { allowed: true };
   }
   
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = spreadsheet.getSheetByName(CONFIG.SHEET_NAME);
+  
+  // If sheet doesn't exist, use the first sheet
+  if (!sheet) {
+    sheet = spreadsheet.getSheets()[0];
+  }
+  
   const data = sheet.getDataRange().getValues();
   
   // Get current time and rate limit cutoff
@@ -183,11 +202,11 @@ function verifyRecaptcha(token) {
       return true;
     }
     
-    Logger.log('reCAPTCHA failed: ' + JSON.stringify(result));
+    console.log('reCAPTCHA failed: ' + JSON.stringify(result));
     return false;
     
   } catch (error) {
-    Logger.log('reCAPTCHA verification error: ' + error.toString());
+    console.log('reCAPTCHA verification error: ' + error.toString());
     return false;
   }
 }
@@ -231,12 +250,22 @@ function createErrorResponse(message) {
  * Run this once manually to initialize
  */
 function setupSpreadsheet() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = spreadsheet.getSheetByName(CONFIG.SHEET_NAME);
+  console.log('Using sheet: ' + sheet.getName());
+  // If sheet doesn't exist, use the first sheet
+  if (!sheet) {
+    sheet = spreadsheet.getSheets()[0];
+    console.log('Using sheet: ' + sheet.getName());
+  }
   
   // Check if headers already exist
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(['Timestamp', 'Email', 'Interests', 'Language', 'Source', 'User Agent']);
     sheet.getRange(1, 1, 1, 6).setFontWeight('bold');
     sheet.setFrozenRows(1);
+    console.log('Headers added to sheet: ' + sheet.getName());
+  } else {
+    console.log('Sheet already has data. Row count: ' + sheet.getLastRow());
   }
 }
